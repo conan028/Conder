@@ -7,8 +7,8 @@ import org.jetbrains.annotations.Nullable;
 import java.sql.*;
 import java.util.logging.Level;
 
-import static com.conan.bots.review.Main.LOGGER;
-import static com.conan.bots.review.Main.getConfig;
+import static com.conan.bots.review.ReviewBot.LOGGER;
+import static com.conan.bots.review.ReviewBot.getConfig;
 
 public class MySQLHandler implements Database {
 

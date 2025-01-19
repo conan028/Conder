@@ -1,7 +1,9 @@
 package com.conan.bots.review.listeners;
 
+import com.conan.bots.review.ReviewBot;
 import com.conan.bots.review.models.Review;
 import com.conan.bots.review.utils.RU;
+import io.github.cdimascio.dotenv.Dotenv;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -9,6 +11,7 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import net.dv8tion.jda.api.interactions.modals.Modal;
+import net.dv8tion.jda.api.sharding.ShardManager;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
@@ -16,7 +19,7 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.logging.Level;
 
-import static com.conan.bots.review.Main.LOGGER;
+import static com.conan.bots.review.ReviewBot.*;
 import static com.conan.bots.review.datastore.DatabaseHandler.dbHandler;
 
 public class ReviewListener extends ListenerAdapter {
@@ -59,8 +62,11 @@ public class ReviewListener extends ListenerAdapter {
                     event.reply("This user has never given a review.").setEphemeral(true).queue();
                     return;
                 }
-
-                event.getChannel().deleteMessageById(review.messageId()).queue();
+                Dotenv config = getConfig();
+                String reviewChannel = config.get("REVIEW_CHANNEL");
+                ShardManager shardManager = getShardManager();
+                assert reviewChannel != null;
+                Objects.requireNonNull(shardManager.getTextChannelById(reviewChannel)).deleteMessageById(review.messageId()).queue();
                 dbHandler.removeReview(userId);
                 event.reply(String.format("Removed %s's review.", review.username())).setEphemeral(true).queue();
             } catch (Exception e) {
@@ -111,7 +117,12 @@ public class ReviewListener extends ListenerAdapter {
                         Color.GREEN
                 );
 
-                event.getChannel().sendMessageEmbeds(eb.buildEmbed().build()).queue( message -> {
+                Dotenv config = getConfig();
+                String reviewChannel = config.get("REVIEW_CHANNEL");
+                ShardManager shardManager = getShardManager();
+
+                assert reviewChannel != null;
+                Objects.requireNonNull(shardManager.getTextChannelById(reviewChannel)).sendMessageEmbeds(eb.buildEmbed().build()).queue(message -> {
                     String messageId = message.getId();
 
                     try {
