@@ -5,7 +5,7 @@ A simple light-weighted review system for Discord servers that works with MySQL.
 
 ### Commands
  - /review -> Leave a review behind.
- - /removereview <userId> -> Removes a review from said userId.
+ - /removereview `userId` -> Removes a review from said userId.
 
 ## For Developers
 ---
