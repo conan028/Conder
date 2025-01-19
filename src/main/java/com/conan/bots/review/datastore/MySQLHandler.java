@@ -141,7 +141,7 @@ public class MySQLHandler implements Database {
             FROM reviewers r
             JOIN reviews rw ON r.id = rw.userId
             WHERE r.userId = ?
-        """;
+        """.trim();
 
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setString(1, userId);
